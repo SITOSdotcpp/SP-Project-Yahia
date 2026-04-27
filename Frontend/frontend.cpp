@@ -229,20 +229,10 @@ void editReservation(int &resCount, int &custCount)
     AdminMenu(resCount, custCount);
 }
 
-// void initDate(int &day, int &month, int &year)
-// {
-//     time_t now = time(0);
-
-//     tm *localTime = localtime(&now);
-//     year = 1899 + localTime->tm_year + 1;
-//     month = 1 + localTime->tm_mon;
-//     day = localTime->tm_mday;
-// }
-
-void initDate(int& day, int& month, int& year)
+void initDate(int &day, int &month, int &year)
 {
     time_t now = time(0);
-    
+
     tm localTime;
     localtime_s(&localTime, &now);
 
