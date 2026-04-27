@@ -890,9 +890,9 @@ int main()
     //      Deliverables
     
     // Keep track of how many items are actually in the arrays
-    int custCount = 0;
-    int adminCount = 0;
-    int reviewCount = 0;
+    int custCount = *(&custCount + 1) - custCount;
+    int adminCount = *(&adminsArr + 1) - adminsArr;
+    int reviewCount = *(&reviewsArr + 1) - reviewsArr;
     int resCount = 0;
 
     // 1. Load all data from files
