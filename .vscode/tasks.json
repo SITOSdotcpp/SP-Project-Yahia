@@ -9,7 +9,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "${fileDirname}\\frontend_test.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"

@@ -268,20 +268,24 @@ void showLastMonth()
 void View_room_reviews(int& resCount, int& custCount)
 {
     int choice;
-    cout << "1 for All reviews" << endl;
-    cout << "2 for Unseen reviews" << endl;
-    cout << "3 for Last 30 days reviews" << endl;
+    cout << "(1) for All reviews" << endl;
+    cout << "(2) for Unseen reviews" << endl;
+    cout << "(3) for Last 30 days reviews" << endl;
     cin >> choice;
     if (choice == 1)
     {
-        for (int i = 0; i < MAXREVIEWS; i++)
+        for (int i = 0; i < counter_of_review_number; i++)
         {
 
             if (reviewsArr[i].Review_content != "###")
             {
+
+                cout << "\n----------- Review ------------\n";
                 cout << "Review for Room: " << reviewsArr[i].Room_number << endl;
                 cout << "Time of Review: " << reviewsArr[i].Date_valid.day << "/" << reviewsArr[i].Date_valid.month << "/" << reviewsArr[i].Date_valid.year << " .\n";
                 cout << "Review: " << reviewsArr[i].Review_content << endl;
+                cout << "_______________________________\n";
+
                 reviewsArr[i].Seen = true;
                 cout << "\n";
             }
@@ -289,23 +293,27 @@ void View_room_reviews(int& resCount, int& custCount)
     }
     else if (choice == 2)
     {
-        int count = 0;
-        for (int i = 0; i < MAXREVIEWS; i++)
+        bool FoundReview=false;
+        for (int i = 0; i < counter_of_review_number; i++)
         {
-            if (reviewsArr[i].Seen == false && reviewsArr[i].Review_content != "###")
+            if ((!reviewsArr[i].Seen) && reviewsArr[i].Review_content != "###")
             {
+                cout << "\n----------- Review ------------\n";
                 cout << "Review for Room: " << reviewsArr[i].Room_number << endl;
                 cout << "Time of Review: " << reviewsArr[i].Date_valid.day << "/" << reviewsArr[i].Date_valid.month << "/" << reviewsArr[i].Date_valid.year << " .\n";
                 cout << "Review: " << reviewsArr[i].Review_content << endl;
+                cout << "_______________________________\n";
+
                 reviewsArr[i].Seen = true;
-                count++;
+                FoundReview = true;
             }
 
-            if (count == 0)
-            {
-                cout << "\n\nNo unseen reviews currently.\n\n";
-            }
         }
+        if (!FoundReview)
+        {
+            cout << "\n\nNo unseen reviews currently.\n\n";
+        }
+ 
     }
     else if (choice == 3)
     {
@@ -399,8 +407,7 @@ bool CheckRoomIsBooked(stRoom Room)
             }
         }
     }
-    
- 
+    return false; // Room not found, assume not booked
 }
 
 void ReserveRoomScreen()
@@ -493,7 +500,7 @@ bool CheckCustomerIsBookedThisRoom(stRoom Room)
             }
         }
     }
-  
+    return false; // Not booked by this customer
 }
 void CancelRoom(int& resCount, int& custCount) // this is the main function
 {
