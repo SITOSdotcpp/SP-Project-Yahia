@@ -298,7 +298,7 @@ void showLastMonth()
     int day, month, year;
     initDate(day, month, year);
     Date DateNow = { day,month,year };
-
+    bool FoundReview = false;          // new
     for (int i = 0; i < counter_of_review_number; i++)
     {
 
@@ -311,7 +311,12 @@ void showLastMonth()
             cout << "_______________________________\n";
 
             reviewsArr[i].Seen = true;
+            FoundReview = true;         // new
         }
+    }
+    if (!FoundReview)                     //new
+    {
+        cout << "\nThere is no review for the past 30 days.\n";
     }
 }
 
@@ -780,6 +785,7 @@ void review(int& resCount, int& custCount)
     reviewsArr[counter_of_review_number].Review_id = 1 + counter_of_review_number;
     // cout << "please enter your room number: ";
     // cin >> reviewsArr[counter_of_review_number].Room_number;
+    cout << "\n-----------------Add Review-----------------\n";
     cout << "Enter the room that you want to add review ? ";
     stRoom Room;
     cin >> Room.roomNumber;
@@ -1082,6 +1088,6 @@ int main()
     saveAdmins(adminsArr, adminCount);
     saveReviews(reviewsArr, reviewCount);
     saveRooms(roomsArr, FLOORS, ROOMS);
-     
-  
+
+   
 }
