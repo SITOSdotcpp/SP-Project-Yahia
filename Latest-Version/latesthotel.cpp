@@ -840,7 +840,7 @@ void CheckRoomsBookedNow(int custCount)
 
                 for (int k = 0; k < custCount; k++)
                 {
-                    if (customersArr[k].CustomerID == roomsArr[i][j].RoomID && IsDate1AfterDate2(customersArr[k].EndDate, DateNow))
+                    if (customersArr[k].CustomerID == roomsArr[i][j].RoomID && IsDate1AfterDate2(DateNow, customersArr[k].EndDate ))
                     {
 
                         roomsArr[i][j].RoomID = "";
