@@ -18,7 +18,13 @@ const int CUSTSIZE = 500;
 //----------------------------------------------------------------------------------------------
 struct Date
 {
-    int day, month, year;
+    int day = -1, month = -1, year = -1;
+};
+
+struct stPeriod
+{
+    Date StartDate;
+    Date EndDate;
 };
 
 struct Admin
@@ -465,13 +471,21 @@ bool CheckRoomIsBooked(stRoom Room)
     return false; // Room not found, assume not booked
 }
 
-void ReserveRoomScreen()
+void ReserveRoomScreen(int &resCount, int &custCount)
 {
-    // system("cls");
-    cout << "\n\n";
-    cout << "--------------------------------------------------\n";
-    cout << "                Reserve Room Screen                \n";
-    cout << "--------------------------------------------------\n\n";
+    if (customersArr[loggedInIndex].roomNumber == -1)
+    {
+        // system("cls");
+        cout << "\n\n";
+        cout << "--------------------------------------------------\n";
+        cout << "                Reserve Room Screen                \n";
+        cout << "--------------------------------------------------\n\n";
+    }
+    else
+    {
+        cout << "\n\nYou already have a room reserved currently.\n\n";
+        menu(resCount, custCount);
+    }
 }
 
 bool Ask(string TheAsk)
@@ -488,7 +502,7 @@ bool Ask(string TheAsk)
 void ReserveRoom(int &resCount, int &custCount) // this is the main function
 {
     bool Found = false;
-    ReserveRoomScreen(); // clear screen and show header
+    ReserveRoomScreen(resCount, custCount); // clear screen and show header
     stRoom Room;
     Room = ReadReserveRoomInfo();
 
@@ -577,6 +591,14 @@ void CancelRoom(int &resCount, int &custCount) // this is the main function
                     {
                         roomsArr[i][j].isAvailable = true;
                         roomsArr[i][j].RoomID = "";
+                        customersArr[loggedInIndex].EndDate.day = -1;
+                        customersArr[loggedInIndex].EndDate.month = -1;
+                        customersArr[loggedInIndex].EndDate.year = -1;
+                        customersArr[loggedInIndex].StartDate.day = -1;
+                        customersArr[loggedInIndex].StartDate.month = -1;
+                        customersArr[loggedInIndex].StartDate.year = -1;
+                        customersArr[loggedInIndex].roomNumber = -1;
+
                         Found = true;
                         break;
                     }
@@ -597,35 +619,105 @@ void CancelRoom(int &resCount, int &custCount) // this is the main function
     menu(resCount, custCount);
 }
 
-void checkAvailability(int &resCount, int &custCount)
+// void checkAvailability(int &resCount, int &custCount)
+// {
+
+//     int rNum;
+//     bool found = false;
+//     cout << "\n-----------------Check Room Availability-----------------\n";
+//     cout << "Our Hotel Has a Total Number of 50 Rooms\n";
+//     cout << "Enter Room Number To Check its Availaility: ";
+//     cin >> rNum;
+//     Check_Choice_Validity(rNum, 1, 50);
+
+//     for (int i = 0; i < FLOORS; i++)
+//     {
+//         for (int j = 0; j < ROOMS; j++)
+//         {
+//             if (roomsArr[i][j].roomNumber == rNum)
+//             {
+//                 found = true;
+//                 if (roomsArr[i][j].isAvailable)
+//                 {
+//                     cout << "Good news! Room " << rNum << " is Available.\n";
+//                 }
+//                 else
+//                 {
+//                     cout << "Sorry, Room " << rNum << " is already Reserved.\n";
+//                 }
+//                 break;
+//             }
+//         }
+//     }
+
+//     // if (!found)
+//     // {
+//     //     cout << "Room number not found in our system.\n";
+//     // }
+//     cout << "\n\n";
+//     menu(resCount, custCount);
+// }
+
+bool IsDate1BeforeDate2(Date Date1, Date Date2)
+{
+    return (Date1.year < Date2.year) ? true : ((Date1.year == Date2.year) ? (Date1.month < Date2.month ? true : (Date1.month == Date2.month ? Date1.day < Date2.day : false)) : false);
+}
+bool IsOverlapPeriods(stPeriod Period1, stPeriod Period2)
 {
 
-    int rNum;
+    if (
+        IsDate1BeforeDate2(Period2.EndDate, Period1.StartDate) ||
+        IsDate1AfterDate2(Period2.StartDate, Period1.EndDate))
+        return false;
+    else
+        return true;
+}
+void checkAvailability(int &resCount, int &custCount)
+{
+    stPeriod Period1;
+    stPeriod period2;
+
+    int Floor;
     bool found = false;
     cout << "\n-----------------Check Room Availability-----------------\n";
     cout << "Our Hotel Has a Total Number of 50 Rooms\n";
-    cout << "Enter Room Number To Check its Availaility: ";
-    cin >> rNum;
-    Check_Choice_Validity(rNum, 1, 50);
+    cout << "Enter Floor Number To Check its Availaility: ";
+    cin >> Floor;
+    Check_Choice_Validity(Floor, 1, 5);
+    cout << "\nEnter Start Date? (DD/MM/YYYY)? ";
+    cin >> period2.StartDate.day >> period2.StartDate.month >> period2.StartDate.year;
+    cout << "\nEnter Start Date? (DD/MM/YYYY)? ";
+    cin >> period2.EndDate.day >> period2.EndDate.month >> period2.EndDate.year;
 
-    for (int i = 0; i < FLOORS; i++)
+    Floor -= 1; // indx
+    cout << "\nAvailable rooms: ";
+    for (int j = 0; j < ROOMS; j++)
     {
-        for (int j = 0; j < ROOMS; j++)
+        if (roomsArr[Floor][j].isAvailable)
         {
-            if (roomsArr[i][j].roomNumber == rNum)
+            cout << roomsArr[Floor][j].roomNumber << "  ";
+            found = true;
+        }
+        else
+        {
+            for (int k = 0; k < custCount; k++)
             {
-                found = true;
-                if (roomsArr[i][j].isAvailable)
+                if ((roomsArr[Floor][j].RoomID == customersArr[k].CustomerID))
                 {
-                    cout << "Good news! Room " << rNum << " is Available.\n";
+                    Period1.StartDate = customersArr[k].StartDate;
+                    Period1.EndDate = customersArr[k].EndDate;
+                    if (!IsOverlapPeriods(Period1, period2))
+                    {
+                        cout << roomsArr[Floor][j].roomNumber << "  ";
+                        found = true;
+                    }
                 }
-                else
-                {
-                    cout << "Sorry, Room " << rNum << " is already Reserved.\n";
-                }
-                break;
             }
         }
+    }
+    if (!found)
+    {
+        cout << "NO RESULT :[";
     }
 
     // if (!found)
@@ -686,8 +778,9 @@ void signUp(int &resCount, int &custCount)
     } while (!check);
     cout << "Enter your password: ";
     cin >> customersArr[custCount].Password;
-    cout << "Please enter your id number: ";
-    cin >> customersArr[custCount].CustomerID;
+    /*cout << "Please enter your id number: ";
+    cin >> customersArr[custCount].CustomerID;*/
+    customersArr[custCount].CustomerID = to_string(100 + custCount);
     custCount++;
     cout << "Account is activated successfully \n";
     char choice;
@@ -702,7 +795,8 @@ void signUp(int &resCount, int &custCount)
         }
         else if (choice == 'n' || choice == 'N')
         {
-            cout << "thank you for your visit \n";
+            cout << "thank you for signing up! \n";
+            start(resCount, custCount);
             break;
         }
         else
@@ -825,7 +919,43 @@ void Check_Choice_Validity(int &choice, int start, int end)
         cin >> choice;
     }
 }
+void CheckRoomsBookedNow(int custCount)
+{
+    int day, month, year;
+    initDate(day, month, year);
+    Date DateNow = {day, month, year};
 
+    for (int i = 0; i < FLOORS; i++)
+    {
+        for (int j = 0; j < ROOMS; j++)
+        {
+            if (!roomsArr[i][j].isAvailable)
+            {
+
+                for (int k = 0; k < CUSTSIZE; k++)
+                {
+                    if (customersArr[k].CustomerID == roomsArr[i][j].RoomID && IsDate1AfterDate2(DateNow, customersArr[k].EndDate))
+                    {
+
+                        roomsArr[i][j].RoomID = "";
+                        roomsArr[i][j].isAvailable = true;
+
+                        customersArr[k].StartDate.day = -1;
+                        customersArr[k].StartDate.month = -1;
+                        customersArr[k].StartDate.year = -1;
+
+                        customersArr[k].EndDate.day = -1;
+                        customersArr[k].EndDate.month = -1;
+                        customersArr[k].EndDate.year = -1;
+                        customersArr[k].roomNumber = -1;
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
 void start(int &resCount, int &custCount)
 {
     int accountChoice;
@@ -864,14 +994,21 @@ void saveCustomers(Customer customersArr[], int custCount)
     ofstream outFile("customers.txt"); // Create/overwrite file
     if (outFile.is_open())
     {
-        for (int i = 0; i <= custCount; i++)
+        for (int i = 0; i < custCount; i++)
         {
             outFile << customersArr[i].CustomerID << "\n"
                     << customersArr[i].Name << "\n"
                     << customersArr[i].Email << "\n"
                     << customersArr[i].UserName << "\n"
                     << customersArr[i].Password << "\n"
-                    << customersArr[i].CreditCardNumber << "\n";
+                    << customersArr[i].CreditCardNumber << "\n"
+                    << customersArr[i].StartDate.day << "\n"
+                    << customersArr[i].StartDate.month << "\n"
+                    << customersArr[i].StartDate.year << "\n"
+                    << customersArr[i].EndDate.day << "\n"
+                    << customersArr[i].EndDate.month << "\n"
+                    << customersArr[i].EndDate.year << "\n"
+                    << customersArr[i].roomNumber << "\n";
         }
         outFile.close();
     }
@@ -945,6 +1082,14 @@ int loadCustomers(Customer customersArr[], int n)
             getline(inFile, customersArr[i].UserName);
             getline(inFile, customersArr[i].Password);
             getline(inFile, customersArr[i].CreditCardNumber);
+            inFile >> customersArr[i].StartDate.day;
+            inFile >> customersArr[i].StartDate.month;
+            inFile >> customersArr[i].StartDate.year;
+            inFile >> customersArr[i].EndDate.day;
+            inFile >> customersArr[i].EndDate.month;
+            inFile >> customersArr[i].EndDate.year;
+            inFile >> customersArr[i].roomNumber;
+            inFile.ignore();
             i++;
         }
 
@@ -1066,17 +1211,17 @@ int main()
         customersArr[2] = {"102", "Omar Osama", "Omar@gmail.com", "omarOS", "omaros123", "7777888899990000"};
         customersArr[3] = {"103", "Anas", "Anas@gmail.com", "drageez", "anas123", "0000111122223333"};
         customersArr[4] = {"104", "Moaz", "Moaz@gmail.com", "moaz", "moaz123", "3333444455556666"};
-        customersArr[5] = {"104", "Omar Emad", "Moaz@gmail.com", "omarEM", "omarem123", "6666777788889999"};
+        customersArr[5] = {"105", "Omar Emad", "Moaz@gmail.com", "omarEM", "omarem123", "6666777788889999"};
 
         custCount = 6;
 
         //      Pre-defined Reviews
-        reviewsArr[0] = {2, 2, 2026, "very nice room & service", 1, 1};
-        reviewsArr[1] = {14, 2, 2026, "good vacation spot", 2, 2};
-        reviewsArr[2] = {27, 1, 2026, "horrible service & staff", 3, 10};
-        reviewsArr[3] = {2, 4, 2026, "the rooms were very nice and clean and had a great view!", 4, 19};
-        reviewsArr[4] = {13, 1, 2026, "it was okay.", 5, 27};
-        reviewsArr[5] = {25, 12, 2025, "the food was great.", 6, 48};
+        reviewsArr[0] = {{2, 2, 2026}, "very nice room & service", 1, 1};
+        reviewsArr[1] = {{14, 2, 2026}, "good vacation spot", 2, 2};
+        reviewsArr[2] = {{27, 1, 2026}, "horrible service & staff", 3, 10};
+        reviewsArr[3] = {{2, 4, 2026}, "the rooms were very nice and clean and had a great view!", 4, 19};
+        reviewsArr[4] = {{13, 1, 2026}, "it was okay.", 5, 27};
+        reviewsArr[5] = {{25, 12, 2025}, "the food was great.", 6, 48};
 
         reviewCount = 6;
     }
@@ -1089,7 +1234,7 @@ int main()
             roomsArr[i][j].roomNumber = (i + 1) * ROOMS - (ROOMS - (j + 1));
         }
     }
-
+    CheckRoomsBookedNow(custCount);
     //      Running Sequence
     start(resCount, custCount);
 }
