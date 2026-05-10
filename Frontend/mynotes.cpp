@@ -79,3 +79,19 @@
 // this reservation isn't recorded
 // when trying to edit the reservation
 // it says (No active reservation found for this room number.)
+
+//PROBLEM SOLVED
+
+
+
+// too much newlines
+// PROBLEM SOLVED
+
+// saving and loading problem
+// PROBLEM SOLVED
+
+// rooms array not saved or loaded
+// FIXED
+
+
+

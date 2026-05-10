@@ -4,39 +4,74 @@
 very nice room & service
 1
 1
-0
+1
 14
 2
 2026
 good vacation spot
 2
 2
-0
+1
 27
 1
 2026
 horrible service & staff
 3
 10
-0
+1
 2
 4
 2026
 the rooms were very nice and clean and had a great view!
 4
 19
-0
+1
 13
 1
 2026
 it was okay.
 5
 27
-0
+1
 25
 12
 2025
 the food was great.
 6
 48
+1
+1
+1
+2026
+test rev
+7
+1
+1
+26
+3
+2026
+very nice room with a great view, alson very clean
+8
+16
+1
+29
+3
+2026
+eh al araf da
+9
+27
+1
+7
+5
+2026
+this room looks very nice
+10
+5
+1
+10
+5
+2026
+i enjoyed my stay very much in this hotel!
+11
+5
 0

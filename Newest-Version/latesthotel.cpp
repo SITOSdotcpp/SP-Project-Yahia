@@ -18,7 +18,13 @@ const int CUSTSIZE = 500;
 //----------------------------------------------------------------------------------------------
 struct Date
 {
-    int day, month, year;
+    int day = -1, month = -1, year = -1;
+};
+
+struct stPeriod
+{
+    Date StartDate;
+    Date EndDate;
 };
 
 struct Admin
@@ -71,26 +77,29 @@ int counter_of_review_number = 6;
 //----------------------------------------------------------------------------------------------
 //------------------------------ | Checking Choice Validition | --------------------------------
 //----------------------------------------------------------------------------------------------
-void Check_Choice_Validity(int& choice, int start, int end);
+void Check_Choice_Validity(int &choice, int start, int end);
 
 //----------------------------------------------------------------------------------------------
-//------------------------------------- | DELIVERABLES | ---------------------------------------
+//------------------------------------- | SAVING | --------------------------------------------
 //----------------------------------------------------------------------------------------------
-
+void saveCustomers(Customer customersArr[], int custCount);
+void saveAdmins(Admin adminsArr[], int adminCount);
+void saveReviews(Review reviewsArr[], int reviewCount);
+void saveRooms(stRoom roomsArr[5][10], int floors_count, int rooms_count);
 //----------------------------------------------------------------------------------------------
 //----------------------------------- | ADMIN FUNCTIONS | --------------------------------------
 //----------------------------------------------------------------------------------------------
-void start(int& resCount, int& custCount);
-void AdminMenu(int& resCount, int& custCount);
-void adminAddReservation(int& resCount, int& custCount);
-void editReservation(int& resCount, int& custCount);
-void View_room_reviews(int& resCount, int& custCount);
-void Admin_logout(int& resCount, int& custCount);
-bool Admin_login(int& resCount, int& custCount);
-void initDate(int& day, int& month, int& year);
+void start(int &resCount, int &custCount);
+void AdminMenu(int &resCount, int &custCount);
+void adminAddReservation(int &resCount, int &custCount);
+void editReservation(int &resCount, int &custCount);
+void View_room_reviews(int &resCount, int &custCount);
+void Admin_logout(int &resCount, int &custCount);
+bool Admin_login(int &resCount, int &custCount);
+void initDate(int &day, int &month, int &year);
 void showLastMonth();
 
-void AdminMenu(int& resCount, int& custCount)
+void AdminMenu(int &resCount, int &custCount)
 {
     int choice;
     cout << "[1] View Room Reviews\n";
@@ -118,7 +127,7 @@ void AdminMenu(int& resCount, int& custCount)
     }
 }
 
-int findCust(string& username)
+int findCust(string &username)
 {
     for (int i = 0; i < CUSTSIZE; i++)
     {
@@ -130,7 +139,7 @@ int findCust(string& username)
     return -1;
 }
 
-void adminAddReservation(int& resCount, int& custCount)
+void adminAddReservation(int &resCount, int &custCount)
 {
     int rNum;
     string username;
@@ -190,7 +199,7 @@ void adminAddReservation(int& resCount, int& custCount)
     AdminMenu(resCount, custCount);
 }
 
-void editReservation(int& resCount, int& custCount)
+void editReservation(int &resCount, int &custCount)
 {
     int rNum;
     bool found = false;
@@ -204,7 +213,7 @@ void editReservation(int& resCount, int& custCount)
         {
             found = true;
             cout << "Reservation found. Current Customer: "
-                << customersArr[i].Name << endl;
+                 << customersArr[i].Name << endl;
 
             cout << "Enter New Customer Name: ";
             cin >> customersArr[i].Name;
@@ -229,7 +238,7 @@ void editReservation(int& resCount, int& custCount)
     AdminMenu(resCount, custCount);
 }
 
-void initDate(int& day, int& month, int& year)
+void initDate(int &day, int &month, int &year)
 {
     time_t now = time(0);
 
@@ -240,29 +249,28 @@ void initDate(int& day, int& month, int& year)
     month = 1 + localTime.tm_mon;
     day = localTime.tm_mday;
 }
-//struct Date
+// struct Date
 //{
-//    short day;
-//    short month;
-//    short year;
-//};
+//     short day;
+//     short month;
+//     short year;
+// };
 bool isLeapYear(short year)
 {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 }
 bool IsDate1AfterDate2(Date Date1, Date Date2)
 {
-    return  (Date1.year > Date2.year) ? true : ((Date1.year == Date2.year) ? (Date1.month > Date2.month ? true : (Date1.month == Date2.month ? Date1.day > Date2.day : false)) : false);
+    return (Date1.year > Date2.year) ? true : ((Date1.year == Date2.year) ? (Date1.month > Date2.month ? true : (Date1.month == Date2.month ? Date1.day > Date2.day : false)) : false);
 }
 short NumberOfDaysInAMonth(short month, short year)
 {
 
-    if (month < 1 || month>12)
-        return  0;
+    if (month < 1 || month > 12)
+        return 0;
 
-    int days[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    int days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     return (month == 2) ? (isLeapYear(year) ? 29 : 28) : days[month - 1];
-
 }
 Date DecreaseDateByOneMonth(Date Date)
 {
@@ -281,14 +289,13 @@ Date DecreaseDateByOneMonth(Date Date)
         Date.day = NumberOfDaysInCurrentMonth;
     }
 
-
     return Date;
 }
 bool IsDate1EqualDate2(Date Date1, Date Date2)
 {
-    return  (Date1.year == Date2.year) ? ((Date1.month == Date2.month) ? ((Date1.day == Date2.day) ? true : false) : false) : false;
+    return (Date1.year == Date2.year) ? ((Date1.month == Date2.month) ? ((Date1.day == Date2.day) ? true : false) : false) : false;
 }
-bool IsDateBeforeMonthOrless(Date DateCheck, Date DateNow)  // put this function in if condition 
+bool IsDateBeforeMonthOrless(Date DateCheck, Date DateNow) // put this function in if condition
 {
     Date DateBeforeMonth = DecreaseDateByOneMonth(DateNow);
     return (!IsDate1AfterDate2(DateCheck, DateNow)) && (IsDate1AfterDate2(DateCheck, DateBeforeMonth) || IsDate1EqualDate2(DateBeforeMonth, DateCheck));
@@ -297,8 +304,8 @@ void showLastMonth()
 {
     int day, month, year;
     initDate(day, month, year);
-    Date DateNow = { day,month,year };
-    bool FoundReview = false;          // new
+    Date DateNow = {day, month, year};
+    bool FoundReview = false; // new
     for (int i = 0; i < counter_of_review_number; i++)
     {
 
@@ -311,16 +318,16 @@ void showLastMonth()
             cout << "_______________________________\n";
 
             reviewsArr[i].Seen = true;
-            FoundReview = true;         // new
+            FoundReview = true; // new
         }
     }
-    if (!FoundReview)                     //new
+    if (!FoundReview) // new
     {
         cout << "\nThere is no review for the past 30 days.\n";
     }
 }
 
-void View_room_reviews(int& resCount, int& custCount)
+void View_room_reviews(int &resCount, int &custCount)
 {
     int choice;
     cout << "(1) for All reviews" << endl;
@@ -332,7 +339,8 @@ void View_room_reviews(int& resCount, int& custCount)
         for (int i = 0; i < counter_of_review_number; i++)
         {
 
-            if (reviewsArr[i].Review_content != "###")
+            // if (reviewsArr[i].Review_content != "###")
+            if (true)
             {
 
                 cout << "\n----------- Review ------------\n";
@@ -362,13 +370,11 @@ void View_room_reviews(int& resCount, int& custCount)
                 reviewsArr[i].Seen = true;
                 FoundReview = true;
             }
-
         }
         if (!FoundReview)
         {
             cout << "\n\nNo unseen reviews currently.\n\n";
         }
-
     }
     else if (choice == 3)
     {
@@ -378,13 +384,13 @@ void View_room_reviews(int& resCount, int& custCount)
     AdminMenu(resCount, custCount);
 }
 
-void Admin_logout(int& resCount, int& custCount)
+void Admin_logout(int &resCount, int &custCount)
 {
     cout << "Logged out successfully!\n\n";
     start(resCount, custCount);
 }
 
-bool Admin_login(int& resCount, int& custCount)
+bool Admin_login(int &resCount, int &custCount)
 {
     string username, password;
     cout << "Enter username: ";
@@ -414,19 +420,19 @@ bool Admin_login(int& resCount, int& custCount)
 stRoom ReadReserveRoomInfo();
 bool CheckRoomIsBooked(stRoom Room);
 bool Ask(string TheAsk);
-void ReserveRoom(int& resCount, int& custCount);
+void ReserveRoom(int &resCount, int &custCount);
 void CancelRoomScreen();
 stRoom ReadCancelRoomInfo();
-void checkAvailability(int& resCount, int& custCount);
-void login_or_signup(int& resCount, int& custCount);
-void signUp(int& resCount, int& custCount);
-void login(int& resCount, int& custCount);
-void menu(int& resCount, int& custCount);
-void review(int& resCount, int& custCount);
-void customerLogOut(int& resCount, int& custCount);
-void CancelRoom(int& resCount, int& custCount);
+void checkAvailability(int &resCount, int &custCount);
+void login_or_signup(int &resCount, int &custCount);
+void signUp(int &resCount, int &custCount);
+void login(int &resCount, int &custCount);
+void menu(int &resCount, int &custCount);
+void review(int &resCount, int &custCount);
+void customerLogOut(int &resCount, int &custCount);
+void CancelRoom(int &resCount, int &custCount);
 
-void customerLogOut(int& resCount, int& custCount)
+void customerLogOut(int &resCount, int &custCount)
 {
     cout << "Logged out successfully.\n\n";
     start(resCount, custCount);
@@ -465,13 +471,21 @@ bool CheckRoomIsBooked(stRoom Room)
     return false; // Room not found, assume not booked
 }
 
-void ReserveRoomScreen()
+void ReserveRoomScreen(int &resCount, int &custCount)
 {
-    // system("cls");
-    cout << "\n\n";
-    cout << "--------------------------------------------------\n";
-    cout << "                Reserve Room Screen                \n";
-    cout << "--------------------------------------------------\n\n";
+    if (customersArr[loggedInIndex].roomNumber == -1)
+    {
+        // system("cls");
+        cout << "\n\n";
+        cout << "--------------------------------------------------\n";
+        cout << "                Reserve Room Screen                \n";
+        cout << "--------------------------------------------------\n\n";
+    }
+    else
+    {
+        cout << "\n\nYou already have a room reserved currently.\n\n";
+        menu(resCount, custCount);
+    }
 }
 
 bool Ask(string TheAsk)
@@ -485,10 +499,10 @@ bool Ask(string TheAsk)
         return false;
 }
 
-void ReserveRoom(int& resCount, int& custCount) // this is the main function
+void ReserveRoom(int &resCount, int &custCount) // this is the main function
 {
     bool Found = false;
-    ReserveRoomScreen(); // clear screen and show header
+    ReserveRoomScreen(resCount, custCount); // clear screen and show header
     stRoom Room;
     Room = ReadReserveRoomInfo();
 
@@ -557,7 +571,7 @@ bool CheckCustomerIsBookedThisRoom(stRoom Room)
     }
     return false; // Not booked by this customer
 }
-void CancelRoom(int& resCount, int& custCount) // this is the main function
+void CancelRoom(int &resCount, int &custCount) // this is the main function
 {
     bool Found = false;
     CancelRoomScreen(); // clear screen and show header
@@ -577,6 +591,14 @@ void CancelRoom(int& resCount, int& custCount) // this is the main function
                     {
                         roomsArr[i][j].isAvailable = true;
                         roomsArr[i][j].RoomID = "";
+                        customersArr[loggedInIndex].EndDate.day = -1;
+                        customersArr[loggedInIndex].EndDate.month = -1;
+                        customersArr[loggedInIndex].EndDate.year = -1;
+                        customersArr[loggedInIndex].StartDate.day = -1;
+                        customersArr[loggedInIndex].StartDate.month = -1;
+                        customersArr[loggedInIndex].StartDate.year = -1;
+                        customersArr[loggedInIndex].roomNumber = -1;
+
                         Found = true;
                         break;
                     }
@@ -597,35 +619,114 @@ void CancelRoom(int& resCount, int& custCount) // this is the main function
     menu(resCount, custCount);
 }
 
-void checkAvailability(int& resCount, int& custCount)
+// void checkAvailability(int &resCount, int &custCount)
+// {
+
+//     int rNum;
+//     bool found = false;
+//     cout << "\n-----------------Check Room Availability-----------------\n";
+//     cout << "Our Hotel Has a Total Number of 50 Rooms\n";
+//     cout << "Enter Room Number To Check its Availaility: ";
+//     cin >> rNum;
+//     Check_Choice_Validity(rNum, 1, 50);
+
+//     for (int i = 0; i < FLOORS; i++)
+//     {
+//         for (int j = 0; j < ROOMS; j++)
+//         {
+//             if (roomsArr[i][j].roomNumber == rNum)
+//             {
+//                 found = true;
+//                 if (roomsArr[i][j].isAvailable)
+//                 {
+//                     cout << "Good news! Room " << rNum << " is Available.\n";
+//                 }
+//                 else
+//                 {
+//                     cout << "Sorry, Room " << rNum << " is already Reserved.\n";
+//                 }
+//                 break;
+//             }
+//         }
+//     }
+
+//     // if (!found)
+//     // {
+//     //     cout << "Room number not found in our system.\n";
+//     // }
+//     cout << "\n\n";
+//     menu(resCount, custCount);
+// }
+
+bool IsDate1BeforeDate2(Date Date1, Date Date2)
+{
+    return (Date1.year < Date2.year) ? true : ((Date1.year == Date2.year) ? (Date1.month < Date2.month ? true : (Date1.month == Date2.month ? Date1.day < Date2.day : false)) : false);
+}
+bool IsOverlapPeriods(stPeriod Period1, stPeriod Period2)
 {
 
-    int rNum;
+    if (
+        IsDate1BeforeDate2(Period2.EndDate, Period1.StartDate) ||
+        IsDate1AfterDate2(Period2.StartDate, Period1.EndDate))
+        return false;
+    else
+        return true;
+}
+//
+
+void checkAvailability(int &resCount, int &custCount)
+{
+    stPeriod Period1;
+    stPeriod period2;
+
+    int Floor;
     bool found = false;
     cout << "\n-----------------Check Room Availability-----------------\n";
     cout << "Our Hotel Has a Total Number of 50 Rooms\n";
-    cout << "Enter Room Number To Check its Availaility: ";
-    cin >> rNum;
-    Check_Choice_Validity(rNum, 1, 50);
+    cout << "Enter Floor Number To Check its Availaility: ";
+    cin >> Floor;
+    Check_Choice_Validity(Floor, 1, 5);
+    cout << "\nEnter Start Date? (DD/MM/YYYY)? ";
+    cin >> period2.StartDate.day >> period2.StartDate.month >> period2.StartDate.year;
+    cout << "\nEnter end Date? (DD/MM/YYYY)? "; // edit start to end
+    cin >> period2.EndDate.day >> period2.EndDate.month >> period2.EndDate.year;
 
-    for (int i = 0; i < FLOORS; i++)
+    Floor -= 1; // indx
+    cout << "\nAvailable rooms: ";
+    for (int j = 0; j < ROOMS; j++)
     {
-        for (int j = 0; j < ROOMS; j++)
+        if (roomsArr[Floor][j].isAvailable)
         {
-            if (roomsArr[i][j].roomNumber == rNum)
+            cout << roomsArr[Floor][j].roomNumber << "  ";
+            found = true;
+        }
+        else
+        {
+            bool OnceUnavailable = false; // new
+            for (int k = 0; k < custCount; k++)
             {
+                if ((roomsArr[Floor][j].RoomID == customersArr[k].CustomerID))
+                {
+                    Period1.StartDate = customersArr[k].StartDate;
+                    Period1.EndDate = customersArr[k].EndDate;
+                    if (IsOverlapPeriods(Period1, period2))
+                    {
+                        OnceUnavailable = true;
+                        break;
+                        // cout << roomsArr[Floor][j].roomNumber << "  ";
+                    }
+                }
+            }
+            if (!OnceUnavailable) // new
+            {
+                cout << roomsArr[Floor][j].roomNumber << "  ";
                 found = true;
-                if (roomsArr[i][j].isAvailable)
-                {
-                    cout << "Good news! Room " << rNum << " is Available.\n";
-                }
-                else
-                {
-                    cout << "Sorry, Room " << rNum << " is already Reserved.\n";
-                }
-                break;
             }
         }
+    }
+    if (!found)
+    {
+        cout << "NO RESULT :[";
     }
 
     // if (!found)
@@ -636,12 +737,12 @@ void checkAvailability(int& resCount, int& custCount)
     menu(resCount, custCount);
 }
 
-void login_or_signup(int& resCount, int& custCount)
+void login_or_signup(int &resCount, int &custCount)
 {
     cout << "\n-----------------Login/sign up Page-----------------\n";
     int choice;
     cout << "welcome to our hotel \n"
-        << "please enter your choice \n";
+         << "please enter your choice \n";
     cout << "[1] login\n";
     cout << "[2] sign up\n";
     cin >> choice;
@@ -657,7 +758,7 @@ void login_or_signup(int& resCount, int& custCount)
         signUp(resCount, custCount);
     }
 }
-void signUp(int& resCount, int& custCount)
+void signUp(int &resCount, int &custCount)
 {
     cout << "\n-----------------Sign up Page-----------------\n";
     bool check;
@@ -678,7 +779,7 @@ void signUp(int& resCount, int& custCount)
             if (customersArr[custCount].UserName == customersArr[k].UserName)
             {
                 cout << "Invalid username \n"
-                    << "Please re-enter username \n";
+                     << "Please re-enter username \n";
                 check = false;
             }
         }
@@ -686,8 +787,9 @@ void signUp(int& resCount, int& custCount)
     } while (!check);
     cout << "Enter your password: ";
     cin >> customersArr[custCount].Password;
-    cout << "Please enter your id number: ";
-    cin >> customersArr[custCount].CustomerID;
+    /*cout << "Please enter your id number: ";
+    cin >> customersArr[custCount].CustomerID;*/
+    customersArr[custCount].CustomerID = to_string(100 + custCount);
     custCount++;
     cout << "Account is activated successfully \n";
     char choice;
@@ -702,18 +804,19 @@ void signUp(int& resCount, int& custCount)
         }
         else if (choice == 'n' || choice == 'N')
         {
-            cout << "thank you for your visit \n";
+            cout << "thank you for signing up! \n";
+            start(resCount, custCount);
             break;
         }
         else
         {
             cout << "invalid choice \n"
-                << "please re-enter choice \n";
+                 << "please re-enter choice \n";
             continue;
         }
     } while (true);
 }
-void login(int& resCount, int& custCount)
+void login(int &resCount, int &custCount)
 {
 
     cout << "-----------------To Login Our Website----------------- \n";
@@ -741,11 +844,11 @@ void login(int& resCount, int& custCount)
         if (!check)
         {
             cout << "invalid username or password \n"
-                << "please re-enter \n";
+                 << "please re-enter \n";
         }
     } while (!check);
 }
-void menu(int& resCount, int& custCount)
+void menu(int &resCount, int &custCount)
 {
     cout << "\n-----------------Menu Page-----------------\n";
     cout << "[1] Check room availability \n";
@@ -780,7 +883,7 @@ void menu(int& resCount, int& custCount)
 
     // } while (true);
 }
-void review(int& resCount, int& custCount)
+void review(int &resCount, int &custCount)
 {
     reviewsArr[counter_of_review_number].Review_id = 1 + counter_of_review_number;
     // cout << "please enter your room number: ";
@@ -817,7 +920,7 @@ void review(int& resCount, int& custCount)
 //----------------------------------------------------------------------------------------------
 //------------------------------------- | Frontend | -------------------------------------------
 //----------------------------------------------------------------------------------------------
-void Check_Choice_Validity(int& choice, int start, int end)
+void Check_Choice_Validity(int &choice, int start, int end)
 {
     while (choice < start or choice > end)
     {
@@ -825,8 +928,44 @@ void Check_Choice_Validity(int& choice, int start, int end)
         cin >> choice;
     }
 }
+void CheckRoomsBookedNow(int custCount)
+{
+    int day, month, year;
+    initDate(day, month, year);
+    Date DateNow = {day, month, year};
 
-void start(int& resCount, int& custCount)
+    for (int i = 0; i < FLOORS; i++)
+    {
+        for (int j = 0; j < ROOMS; j++)
+        {
+            if (!roomsArr[i][j].isAvailable)
+            {
+
+                for (int k = 0; k < CUSTSIZE; k++)
+                {
+                    if (customersArr[k].CustomerID == roomsArr[i][j].RoomID && IsDate1AfterDate2(DateNow, customersArr[k].EndDate))
+                    {
+
+                        roomsArr[i][j].RoomID = "";
+                        roomsArr[i][j].isAvailable = true;
+
+                        customersArr[k].StartDate.day = -1;
+                        customersArr[k].StartDate.month = -1;
+                        customersArr[k].StartDate.year = -1;
+
+                        customersArr[k].EndDate.day = -1;
+                        customersArr[k].EndDate.month = -1;
+                        customersArr[k].EndDate.year = -1;
+                        customersArr[k].roomNumber = -1;
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+void start(int &resCount, int &custCount)
 {
     int accountChoice;
     cout << "\t\t Welcome To Our Hotel Reservation App!\n";
@@ -846,6 +985,11 @@ void start(int& resCount, int& custCount)
 
     else if (accountChoice == 0)
     {
+        // 5. Save all data before the program completely closes
+        saveCustomers(customersArr, custCount);
+        saveAdmins(adminsArr, ADMINCOUNT);
+        saveReviews(reviewsArr, counter_of_review_number);
+        saveRooms(roomsArr, FLOORS, ROOMS);
         cout << "Goodbye!\n";
         exit(0);
     }
@@ -859,14 +1003,21 @@ void saveCustomers(Customer customersArr[], int custCount)
     ofstream outFile("customers.txt"); // Create/overwrite file
     if (outFile.is_open())
     {
-        for (int i = 0; i <= custCount; i++)
+        for (int i = 0; i < custCount; i++)
         {
             outFile << customersArr[i].CustomerID << "\n"
-                << customersArr[i].Name << "\n"
-                << customersArr[i].Email << "\n"
-                << customersArr[i].UserName << "\n"
-                << customersArr[i].Password << "\n"
-                << customersArr[i].CreditCardNumber << "\n";
+                    << customersArr[i].Name << "\n"
+                    << customersArr[i].Email << "\n"
+                    << customersArr[i].UserName << "\n"
+                    << customersArr[i].Password << "\n"
+                    << customersArr[i].CreditCardNumber << "\n"
+                    << customersArr[i].StartDate.day << "\n"
+                    << customersArr[i].StartDate.month << "\n"
+                    << customersArr[i].StartDate.year << "\n"
+                    << customersArr[i].EndDate.day << "\n"
+                    << customersArr[i].EndDate.month << "\n"
+                    << customersArr[i].EndDate.year << "\n"
+                    << customersArr[i].roomNumber << "\n";
         }
         outFile.close();
     }
@@ -881,8 +1032,8 @@ void saveAdmins(Admin adminsArr[], int adminCount)
         {
             // Assuming: username, password, id
             outFile << adminsArr[i].Admin_user_name << "\n"
-                << adminsArr[i].Admin_password << "\n"
-                << adminsArr[i].Admin_id << "\n";
+                    << adminsArr[i].Admin_password << "\n"
+                    << adminsArr[i].Admin_id << "\n";
         }
         outFile.close();
     }
@@ -897,12 +1048,12 @@ void saveReviews(Review reviewsArr[], int reviewCount)
         {
             // Assuming: day, month, year, comment, reviewId, roomId
             outFile << reviewsArr[i].Date_valid.day << "\n"
-                << reviewsArr[i].Date_valid.month << "\n"
-                << reviewsArr[i].Date_valid.year << "\n"
-                << reviewsArr[i].Review_content << "\n"
-                << reviewsArr[i].Review_id << "\n"
-                << reviewsArr[i].Room_number << "\n"
-                << reviewsArr[i].Seen << "\n";
+                    << reviewsArr[i].Date_valid.month << "\n"
+                    << reviewsArr[i].Date_valid.year << "\n"
+                    << reviewsArr[i].Review_content << "\n"
+                    << reviewsArr[i].Review_id << "\n"
+                    << reviewsArr[i].Room_number << "\n"
+                    << reviewsArr[i].Seen << "\n";
         }
         outFile.close();
     }
@@ -915,17 +1066,18 @@ void saveRooms(stRoom roomsArr[5][10], int floors_count, int rooms_count)
     {
         for (int i = 0; i < floors_count; i++)
         {
-            for (int j = 0; j < rooms_count; j++) {
+            for (int j = 0; j < rooms_count; j++)
+            {
                 outFile << roomsArr[i][j].RoomID << "\n"
-                    << roomsArr[i][j].roomNumber << "\n"
-                    << roomsArr[i][j].isAvailable << "\n";
+                        << roomsArr[i][j].roomNumber << "\n"
+                        << roomsArr[i][j].isAvailable << "\n";
             }
         }
         outFile.close();
     }
 }
 
-void loadCustomers(Customer customersArr[], int n)
+int loadCustomers(Customer customersArr[], int n)
 {
     ifstream inFile("customers.txt");
     int i = 0;
@@ -933,20 +1085,29 @@ void loadCustomers(Customer customersArr[], int n)
     {
         while (i < n && inFile >> customersArr[i].CustomerID)
         {
-            // inFile.ignore(); // Clear newline after ID
+            inFile.ignore(); // Clear newline after ID
             getline(inFile, customersArr[i].Name);
             getline(inFile, customersArr[i].Email);
             getline(inFile, customersArr[i].UserName);
             getline(inFile, customersArr[i].Password);
             getline(inFile, customersArr[i].CreditCardNumber);
+            inFile >> customersArr[i].StartDate.day;
+            inFile >> customersArr[i].StartDate.month;
+            inFile >> customersArr[i].StartDate.year;
+            inFile >> customersArr[i].EndDate.day;
+            inFile >> customersArr[i].EndDate.month;
+            inFile >> customersArr[i].EndDate.year;
+            inFile >> customersArr[i].roomNumber;
+            inFile.ignore();
             i++;
         }
 
         inFile.close();
     }
+    return i;
 }
 
-void loadAdmins(Admin adminsArr[], int n)
+int loadAdmins(Admin adminsArr[], int n)
 {
     ifstream inFile("admins.txt");
     int i = 0;
@@ -962,9 +1123,10 @@ void loadAdmins(Admin adminsArr[], int n)
 
         inFile.close();
     }
+    return i;
 }
 
-void loadReviews(Review reviewsArr[], int n)
+int loadReviews(Review reviewsArr[], int n)
 {
     ifstream inFile("reviews.txt");
     int i = 0;
@@ -987,6 +1149,7 @@ void loadReviews(Review reviewsArr[], int n)
 
         inFile.close();
     }
+    return i;
 }
 
 void loadRooms(stRoom roomsArr[5][10], int floors_count, int rooms_count)
@@ -1000,7 +1163,8 @@ void loadRooms(stRoom roomsArr[5][10], int floors_count, int rooms_count)
             for (int j = 0; j < rooms_count; j++)
             {
                 // 1. Read the RoomID (assuming it's a string on its own line)
-                if (!getline(inFile, roomsArr[i][j].RoomID)) break;
+                if (!getline(inFile, roomsArr[i][j].RoomID))
+                    break;
 
                 // 2. Read numeric data
                 // Use [i][j] to specify the exact room in the 2D grid
@@ -1032,44 +1196,41 @@ int main()
     int resCount = 0;
 
     // 1. Load all data from files
-    loadCustomers(customersArr, custCount);
-    loadAdmins(adminsArr, adminCount);
-    loadReviews(reviewsArr, reviewCount);
+    custCount = loadCustomers(customersArr, CUSTSIZE);
+    adminCount = loadAdmins(adminsArr, ADMINCOUNT);
+    counter_of_review_number = loadReviews(reviewsArr, MAXREVIEWS);
     loadRooms(roomsArr, FLOORS, ROOMS);
 
     // 2. Fallback: If files don't exist (e.g., first time running), load hardcoded defaults
-    if (custCount == 0 && adminCount == 0)
-    {
+    // if (custCount == 0 && adminCount == 0)
+    // {
 
-        //      Pre-defined Admins
-        adminsArr[0] = { "yahia", "yahiaadmin123", 1 };
-        adminsArr[1] = { "omarEmad", "omaremadmin123", 2 };
-        adminsArr[2] = { "omarOsama", "omarosadmin123", 3 };
-        adminsArr[3] = { "anas", "anasadmin123", 4 };
-        adminsArr[4] = { "moaz", "moazadmin123", 5 };
-        adminsArr[5] = { "m7md", "m7mdadmin123", 6 };
+    //      Pre-defined Admins
+    adminsArr[0] = {"yahia", "yahiaadmin123", 1};
+    adminsArr[1] = {"omarEmad", "omaremadmin123", 2};
+    adminsArr[2] = {"omarOsama", "omarosadmin123", 3};
+    adminsArr[3] = {"anas", "anasadmin123", 4};
+    adminsArr[4] = {"moaz", "moazadmin123", 5};
+    adminsArr[5] = {"m7md", "m7mdadmin123", 6};
 
-        adminCount = 6;
-        //      Pre-defined Customers
-        customersArr[0] = { "100", "Yahia", "yahiakhaledhelal@gmail.com", "sitos", "yahia123", "1111222233334444" };
-        customersArr[1] = { "101", "Mohammed", "Mohammed@gmail.com", "m7md", "m7md123", "4444555566667777" };
-        customersArr[2] = { "102", "Omar Osama", "Omar@gmail.com", "omarOS", "omaros123", "7777888899990000" };
-        customersArr[3] = { "103", "Anas", "Anas@gmail.com", "drageez", "anas123", "0000111122223333" };
-        customersArr[4] = { "104", "Moaz", "Moaz@gmail.com", "moaz", "moaz123", "3333444455556666" };
-        customersArr[5] = { "104", "Omar Emad", "Moaz@gmail.com", "omarEM", "omarem123", "6666777788889999" };
+    //      Pre-defined Customers
+    customersArr[0] = {"100", "Yahia", "yahiakhaledhelal@gmail.com", "sitos", "yahia123", "1111222233334444"};
+    customersArr[1] = {"101", "Mohammed", "Mohammed@gmail.com", "m7md", "m7md123", "4444555566667777"};
+    customersArr[2] = {"102", "Omar Osama", "Omar@gmail.com", "omarOS", "omaros123", "7777888899990000"};
+    customersArr[3] = {"103", "Anas", "Anas@gmail.com", "drageez", "anas123", "0000111122223333"};
+    customersArr[4] = {"104", "Moaz", "Moaz@gmail.com", "moaz", "moaz123", "3333444455556666"};
+    customersArr[5] = {"105", "Omar Emad", "Moaz@gmail.com", "omarEM", "omarem123", "6666777788889999"};
 
-        custCount = 6;
+    //      Pre-defined Reviews
+    reviewsArr[0] = {{2, 2, 2026}, "very nice room & service", 1, 1, true};
+    reviewsArr[1] = {{14, 2, 2026}, "good vacation spot", 2, 2, true};
+    reviewsArr[2] = {{27, 1, 2026}, "horrible service & staff", 3, 10, true};
+    reviewsArr[3] = {{2, 4, 2026}, "the rooms were very nice and clean and had a great view!", 4, 19, true};
+    reviewsArr[4] = {{13, 1, 2026}, "it was okay.", 5, 27, true};
+    reviewsArr[5] = {{25, 12, 2025}, "the food was great.", 6, 48, true};
 
-        //      Pre-defined Reviews
-        reviewsArr[0] = { 2, 2, 2026, "very nice room & service", 1, 1 };
-        reviewsArr[1] = { 14, 2, 2026, "good vacation spot", 2, 2 };
-        reviewsArr[2] = { 27, 1, 2026, "horrible service & staff", 3, 10 };
-        reviewsArr[3] = { 2, 4, 2026, "the rooms were very nice and clean and had a great view!", 4, 19 };
-        reviewsArr[4] = { 13, 1, 2026, "it was okay.", 5, 27 };
-        reviewsArr[5] = { 25, 12, 2025, "the food was great.", 6, 48 };
-
-        reviewCount = 6;
-    }
+    reviewCount = 6;
+    // }
 
     // 3. Room initialization
     for (int i = 0; i < FLOORS; i++)
@@ -1079,15 +1240,7 @@ int main()
             roomsArr[i][j].roomNumber = (i + 1) * ROOMS - (ROOMS - (j + 1));
         }
     }
-
+    CheckRoomsBookedNow(custCount);
     //      Running Sequence
     start(resCount, custCount);
-
-    // 5. Save all data before the program completely closes
-    saveCustomers(customersArr, custCount);
-    saveAdmins(adminsArr, adminCount);
-    saveReviews(reviewsArr, reviewCount);
-    saveRooms(roomsArr, FLOORS, ROOMS);
-
-   
 }
