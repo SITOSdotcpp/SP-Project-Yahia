@@ -74,8 +74,11 @@ int counter_of_review_number = 6;
 void Check_Choice_Validity(int &choice, int start, int end);
 
 //----------------------------------------------------------------------------------------------
-//------------------------------------- | DELIVERABLES | ---------------------------------------
+//------------------------------------- | SAVING | --------------------------------------------
 //----------------------------------------------------------------------------------------------
+void saveCustomers(Customer customersArr[], int custCount);
+void saveAdmins(Admin adminsArr[], int adminCount);
+void saveReviews(Review reviewsArr[], int reviewCount);
 
 //----------------------------------------------------------------------------------------------
 //----------------------------------- | ADMIN FUNCTIONS | --------------------------------------
@@ -255,7 +258,7 @@ void showLastMonth()
             cout << "Review: " << reviewsArr[i].Review_content << endl;
             reviewsArr[i].Seen = true;
         }
-        else if (reviewsArr[i].Date_valid.year == year && month - reviewsArr[i].Date_valid.month == 1 && reviewsArr[i].Date_valid.day <= day)
+        else if (reviewsArr[i].Date_valid.year == year && month - reviewsArr[i].Date_valid.month == 1 && reviewsArr[i].Date_valid.day >= day)
         {
             cout << "Review for Room: " << reviewsArr[i].Room_number << endl;
             cout << "Time of Review: " << reviewsArr[i].Date_valid.day << "/" << reviewsArr[i].Date_valid.month << "/" << reviewsArr[i].Date_valid.year << " .\n";
@@ -271,6 +274,7 @@ void View_room_reviews(int &resCount, int &custCount)
     cout << "1 for All reviews" << endl;
     cout << "2 for Unseen reviews" << endl;
     cout << "3 for Last 30 days reviews" << endl;
+    cout << counter_of_review_number << '\n';
     cin >> choice;
     if (choice == 1)
     {
@@ -283,14 +287,14 @@ void View_room_reviews(int &resCount, int &custCount)
                 cout << "Time of Review: " << reviewsArr[i].Date_valid.day << "/" << reviewsArr[i].Date_valid.month << "/" << reviewsArr[i].Date_valid.year << " .\n";
                 cout << "Review: " << reviewsArr[i].Review_content << endl;
                 reviewsArr[i].Seen = true;
+                cout << "\n";
             }
-            cout << "\n";
         }
     }
     else if (choice == 2)
     {
         int count = 0;
-        for (int i = 0; i < MAXREVIEWS; i++)
+        for (int i = 0; i < counter_of_review_number; i++)
         {
             if (reviewsArr[i].Seen == false && reviewsArr[i].Review_content != "###")
             {
@@ -300,11 +304,10 @@ void View_room_reviews(int &resCount, int &custCount)
                 reviewsArr[i].Seen = true;
                 count++;
             }
-
-            if (count == 0)
-            {
-                cout << "\n\nNo unseen reviews currently.\n\n";
-            }
+        }
+        if (count == 0)
+        {
+            cout << "\n\nNo unseen reviews currently.\n\n";
         }
     }
     else if (choice == 3)
@@ -501,7 +504,7 @@ void CancelRoom(int &resCount, int &custCount) // this is the main function
 
     if (Ask("\n\nAre you sure you want Cancel this room ? (y/n)? "))
     {
-        if (CheckCustomerIsBookedThisRoomByCustomer(Room)) // if was booked
+        if (CheckCustomerIsBookedThisRoomByCustomer(Room) && Room.roomNumber == customersArr[loggedInIndex].roomNumber) // if was booked
         {
             for (int i = 0; i < FLOORS; i++)
             {
@@ -511,6 +514,7 @@ void CancelRoom(int &resCount, int &custCount) // this is the main function
                     {
                         roomsArr[i][j].isAvailable = true;
                         roomsArr[i][j].RoomID = "";
+                        customersArr[loggedInIndex].roomNumber = -1;
                         break;
                     }
                 }
@@ -770,6 +774,9 @@ void start(int &resCount, int &custCount)
     else if (accountChoice == 0)
     {
         cout << "Goodbye!\n";
+        saveCustomers(customersArr, custCount);
+        saveAdmins(adminsArr, ADMINCOUNT);
+        saveReviews(reviewsArr, counter_of_review_number);
         exit(0);
     }
 }
@@ -782,7 +789,7 @@ void saveCustomers(Customer customersArr[], int custCount)
     ofstream outFile("customers.txt"); // Create/overwrite file
     if (outFile.is_open())
     {
-        for (int i = 0; i <= custCount; i++)
+        for (int i = 0; i < custCount; i++)
         {
             outFile << customersArr[i].CustomerID << "\n"
                     << customersArr[i].Name << "\n"
@@ -831,7 +838,7 @@ void saveReviews(Review reviewsArr[], int reviewCount)
     }
 }
 
-void loadCustomers(Customer customersArr[], int n)
+int loadCustomers(Customer customersArr[], int n)
 {
     ifstream inFile("customers.txt");
     int i = 0;
@@ -839,7 +846,7 @@ void loadCustomers(Customer customersArr[], int n)
     {
         while (i < n && inFile >> customersArr[i].CustomerID)
         {
-            // inFile.ignore(); // Clear newline after ID
+            inFile.ignore(); // Clear newline after ID
             getline(inFile, customersArr[i].Name);
             getline(inFile, customersArr[i].Email);
             getline(inFile, customersArr[i].UserName);
@@ -850,9 +857,10 @@ void loadCustomers(Customer customersArr[], int n)
 
         inFile.close();
     }
+    return i;
 }
 
-void loadAdmins(Admin adminsArr[], int n)
+int loadAdmins(Admin adminsArr[], int n)
 {
     ifstream inFile("admins.txt");
     int i = 0;
@@ -868,9 +876,10 @@ void loadAdmins(Admin adminsArr[], int n)
 
         inFile.close();
     }
+    return i;
 }
 
-void loadReviews(Review reviewsArr[], int n)
+int loadReviews(Review reviewsArr[], int n)
 {
     ifstream inFile("reviews.txt");
     int i = 0;
@@ -893,6 +902,7 @@ void loadReviews(Review reviewsArr[], int n)
 
         inFile.close();
     }
+    return i;
 }
 //----------------------------------------------------------------------------------------------
 //----------------------------------- | MAIN FUNCTION | ----------------------------------------
@@ -909,9 +919,13 @@ int main()
     int resCount = 0;
 
     // 1. Load all data from files
-    loadCustomers(customersArr, custCount);
-    loadAdmins(adminsArr, adminCount);
-    loadReviews(reviewsArr, reviewCount);
+    // loadCustomers(customersArr, custCount);
+    // loadAdmins(adminsArr, adminCount);
+    // loadReviews(reviewsArr, reviewCount);
+
+    custCount = loadCustomers(customersArr, CUSTSIZE);
+    adminCount = loadAdmins(adminsArr, ADMINCOUNT);
+    counter_of_review_number = loadReviews(reviewsArr, MAXREVIEWS);
 
     // 2. Fallback: If files don't exist (e.g., first time running), load hardcoded defaults
     if (custCount == 0 && adminCount == 0)
@@ -960,7 +974,4 @@ int main()
     start(resCount, custCount);
 
     // 5. Save all data before the program completely closes
-    saveCustomers(customersArr, custCount);
-    saveAdmins(adminsArr, adminCount);
-    saveReviews(reviewsArr, reviewCount);
 }
